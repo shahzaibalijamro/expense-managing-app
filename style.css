@@ -1,16 +1,16 @@
 .logo-wrapper {
-    margin-top: 50px;
+    margin-top: 35px;
 }
 
 .main-logo {
     font-family: "Roboto", sans-serif;
     font-weight: 500;
     font-style: normal;
-    font-size: 40px;
+    font-size: 32px;
 }
 
 .logo-font{
-    font-size: 33px;
+    font-size: 25px;
     font-weight: 600;
     margin-top: -10px;
 }
@@ -41,8 +41,64 @@
 }
 
 .btn-success{
+    background-color: #018786 !important;
     padding: 8px 25px !important;
     font-weight: 500 !important;
     font-size: 17px !important;
     margin-left: 2px;
+}
+
+.total-amount-wrapper{
+    background-color: #018786 !important;
+    padding: 30px !important;
+    border-radius: 20px !important;
+    margin-top: 40px !important;
+    margin-bottom: 40px !important;
+}
+
+.total-amount{
+    letter-spacing: 1px;
+    font-size: 21px;
+    font-weight: 400;
+}
+
+.total-amount-2{
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.list-wrapper-in{
+    color: #3f4c6d;
+}
+
+.list-wrapper-out{
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.list-style-left{
+    margin-right: 15px;
+    background-color: #018786;
+    width: 5px;
+}
+
+.list-name{
+    color: #3f4c6d;
+    font-size: 24px;
+}
+
+.list-price{
+    font-size: 21px;
+}
+
+.fa-pen-to-square{
+    color: #018786;
+    font-size: 21px;
+    margin-right: 40px;
+}
+
+.fa-trash-can{
+    color: #018786;
+    font-size: 21px;
 }
