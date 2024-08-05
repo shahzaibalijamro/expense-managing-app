@@ -102,3 +102,96 @@
     color: #018786;
     font-size: 21px;
 }
+
+@media(max-width:450px){
+    .logo-font {
+        font-size: 22px;
+    }
+    .main-logo {
+        font-size: 28px;
+    }
+    .input-wrapper {
+        padding: 23px;
+    }
+    .total-amount{
+        font-size: 19px;
+    }
+    .total-amount-2{
+        font-size: 19px;
+    }
+    .list-name {
+        font-size: 21px;
+    }
+    .list-price {
+        font-size: 20px;
+    }
+    .fa-pen-to-square {
+        margin-right: 30px;
+    }
+    .total-amount-wrapper {
+        margin-top: 30px !important;
+        margin-bottom: 30px !important;
+    }
+}
+
+@media(max-width:400px){
+    .logo-font {
+        font-size: 20px;
+    }
+    .main-logo {
+        font-size: 25px;
+    }
+    .input-wrapper {
+        padding: 20px;
+    }
+    .total-amount{
+        font-size: 19px;
+    }
+    .total-amount-2{
+        font-size: 19px;
+    }
+    .list-name {
+        font-size: 19px;
+    }
+    .list-price {
+        font-size: 19px;
+    }
+    .fa-pen-to-square {
+        margin-right: 20px;
+    }
+    .total-amount-wrapper {
+        margin-top: 25px !important;
+        margin-bottom: 25px !important;
+    }
+}
+
+@media(max-width:350px){
+    .logo-font {
+        font-size: 18px;
+    }
+    .main-logo {
+        font-size: 22px;
+    }
+    .input-wrapper {
+        padding: 20px;
+    }
+    .total-amount{
+        font-size: 18px;
+    }
+    .total-amount-2{
+        font-size: 18px;
+    }
+    .list-name {
+        font-size: 18px;
+    }
+    .list-price {
+        font-size: 18px;
+    }
+    .fa-pen-to-square {
+        margin-right: 20px;
+    }
+    .total-amount-wrapper {
+        margin-top: 25px !important;
+        margin-bottom: 25px !important;
+    }
+}
