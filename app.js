@@ -1,46 +1,44 @@
 const form = document.querySelector('#form');
-const input1 = document.querySelector('#input1');
-const input2 = document.querySelector('#input2');
+const inputTitle = document.querySelector('.input-title');
+const inputAmount = document.querySelector('.input-amount');
 const totalAmountWrapper = document.querySelector('.total-amount-2');
 const listWrapper = document.querySelector('.list-wrapper-out');
 const expenseArr = [];
 let totalAmount;
 form.addEventListener('submit', event => {
     event.preventDefault();
-    console.log(input1.value);
-    console.log(input2.value);
-    // addExpense();
+    addExpense();
     // localStorage.setItem('localDesc',JSON.stringify(description));
     // localStorage.setItem('ls',JSON.stringify(description));
 })
 
 function addExpense() {
-    console.log(input1.value);
-    console.log(input2.value);
-    // let toNumber = Number(input2.value);
-    // expenseArr.push({
-    //     expenseName: input1.value,
-    //     expenseAmount: toNumber
-    // })
-    // input1.value= '';
-    // input2.value= '';
-    // renderExpense();
+    let toNumber = Number(inputAmount.value);
+    expenseArr.push({
+        expenseName: inputTitle.value,
+        expenseAmount: toNumber
+    })
+    inputTitle.value= '';
+    inputAmount.value= '';
+    console.log(expenseArr);
+    renderExpense();
     // totalAmountCalc();
 }
 
 function renderExpense() {
+    listWrapper.innerHTML = '';
     for (let i = 0; i < expenseArr.length; i++) {
         listWrapper.innerHTML += `
         <div class="d-flex justify-content-center list-wrapper-in w-100">
                     <div class="list-style-left">
                     </div>
-                    <div style="flex-grow: 1;" class="d-flex align-items-center">
-                        <h1 class="m-0 list-name">Food</h1>
+                    <div style="width:33%;" class="d-flex align-items-center">
+                        <h1 class="m-0 list-name">${expenseArr[i].expenseName}</h1>
                     </div>
-                    <div style="flex-grow: 1;" class="d-flex justify-content-center align-items-center">
-                        <h2 class="m-0 text-center list-price">$50</h2>
+                    <div style="width:33%;" class="d-flex justify-content-center align-items-center">
+                        <h2 class="m-0 text-center list-price">$${expenseArr[i].expenseAmount}</h2>
                     </div>
-                    <div style="flex-grow: 1;" class="d-flex justify-content-center align-items-center">
+                    <div style="width:33%;" class="d-flex justify-content-center align-items-center">
                         <div class="d-flex justify-content-center">
                             <i class="fa-solid fa-pen-to-square"></i>
                             <i class="fa-solid fa-trash-can"></i>
@@ -49,6 +47,14 @@ function renderExpense() {
                 </div>
         `
     }
+    const editBtn = document.querySelectorAll('.fa-pen-to-square');
+    editBtn.forEach((item,index)=>{
+        item.addEventListener('click',()=>{
+            const edited = prompt('Edit Amount!', expenseArr[index].expenseAmount);
+            expenseArr[index].expenseAmount = edited;
+            renderExpense();
+        })
+    })
 }
 
 function editExpense(index) {
