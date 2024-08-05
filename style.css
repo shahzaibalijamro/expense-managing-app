@@ -86,10 +86,13 @@
 .list-name{
     color: #3f4c6d;
     font-size: 24px;
+    word-break: break-word;
 }
 
 .list-price{
     font-size: 21px;
+    word-break: break-word;
+
 }
 
 .fa-pen-to-square{
