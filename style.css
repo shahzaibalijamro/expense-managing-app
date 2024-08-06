@@ -99,11 +99,13 @@
     color: #018786;
     font-size: 21px;
     margin-right: 40px;
+    cursor: pointer;
 }
 
 .fa-trash-can{
     color: #018786;
     font-size: 21px;
+    cursor: pointer;
 }
 
 @media(max-width:450px){

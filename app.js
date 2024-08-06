@@ -12,7 +12,7 @@ let totalAmount;
 
 
 
-// value sumbition
+    // value sumbition
 form.addEventListener('submit', event => {
     event.preventDefault();
     addExpense();
@@ -20,7 +20,7 @@ form.addEventListener('submit', event => {
 
 
 
-// pushing data to firestore and array
+    // pushing data to firestore and array
 async function addExpense() {
     let toNumber = Number(inputAmount.value);
     try {
@@ -30,9 +30,9 @@ async function addExpense() {
             time: Timestamp.fromDate(new Date())
         });
         expenseArr.push({
-            expenseName: inputTitle.value,
+            expenseTitle: inputTitle.value,
             expenseAmount: toNumber,
-            docId : docRef.id
+            id : docRef.id
         })
         console.log("Document written with ID: ", docRef.id);
         inputTitle.value= '';
@@ -47,8 +47,26 @@ async function addExpense() {
 
 
 
+    // get data from firestore
+async function getData() {
+    const querySnapshot = await getDocs(collection(db, "expenses"));
+    querySnapshot.forEach((doc) => {
+        expenseArr.push({
+            expenseTitle: doc.data().expenseTitle,
+            expenseAmount: doc.data().expenseAmount,
+            time: doc.data().time,
+            id: doc.id
+        });
+    });
+    console.log(expenseArr);
+    renderExpense();
+}
+getData();
 
-// rendering data on the screen 
+
+
+
+    // rendering data on the screen 
 function renderExpense() {
     listWrapper.innerHTML = '';
     for (let i = 0; i < expenseArr.length; i++) {
@@ -57,7 +75,7 @@ function renderExpense() {
                     <div class="list-style-left">
                     </div>
                     <div style="width: 33%;" class="d-flex align-items-center">
-                        <h1 class="m-0 list-name">${expenseArr[i].expenseName}</h1>
+                        <h1 class="m-0 list-name">${expenseArr[i].expenseTitle}</h1>
                     </div>
                     <div style="width: 33%;" class="d-flex justify-content-center align-items-center">
                         <h2 class="m-0 text-center list-price">$${expenseArr[i].expenseAmount}</h2>
@@ -78,8 +96,12 @@ function renderExpense() {
     // edit function
     const editBtn = document.querySelectorAll('.fa-pen-to-square');
     editBtn.forEach((item,index)=>{
-        item.addEventListener('click',()=>{
+        item.addEventListener('click', async ()=>{
             const edited = prompt('Edit Amount!', expenseArr[index].expenseAmount);
+            const updateRef = doc(db, "expenses", expenseArr[index].id);
+            await updateDoc(updateRef, {
+                expenseAmount: edited
+            });
             expenseArr[index].expenseAmount = edited;
             renderExpense();
         })
@@ -91,25 +113,17 @@ function renderExpense() {
     // delete function
     const dltBtn = document.querySelectorAll('.fa-trash-can');
     dltBtn.forEach((item,index)=>{
-        item.addEventListener('click',()=>{
+        item.addEventListener('click',async()=>{
+            await deleteDoc(doc(db, "expenses", expenseArr[index].id));
+            console.log('document dlt with id ==>', expenseArr[index].id);
             expenseArr.splice(index,1)
             renderExpense();
         })
     })
 }
 
-function editExpense(index) {
-    const edited = prompt('Edit Amount!', amountArr[index]);
-    amountArr.splice(index,1,edited);
-    renderExpense();
-}
 
-function dltExpense(index) {
-    amountArr.splice(index,1);
-    description.splice(index,1);
-    renderExpense();
-}
-
+    // calculates Total Amount
 function totalAmountCalc() {
     totalAmount = expenseArr.reduce((accumulator, currentExpense) => {
         return accumulator + currentExpense.expenseAmount;
