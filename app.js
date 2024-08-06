@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"; 
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"; 
 
 import { db } from "./config.js";
 
@@ -7,7 +7,9 @@ const inputTitle = document.querySelector('.input-title');
 const inputAmount = document.querySelector('.input-amount');
 const totalAmountWrapper = document.querySelector('.total-amount-2');
 const listWrapper = document.querySelector('.list-wrapper-out');
-const expenseArr = [];
+const sort = document.querySelector('#sort');
+const sortAmount = document.querySelector('#sortAmount');
+let expenseArr = [];
 let totalAmount;
 
 
@@ -39,7 +41,6 @@ async function addExpense() {
         inputAmount.value= '';
         console.log(expenseArr);
         renderExpense();
-        totalAmountCalc()
     } catch (e) {
         console.error("Error adding document: ", e);
     }
@@ -53,7 +54,7 @@ async function getData() {
     querySnapshot.forEach((doc) => {
         expenseArr.push({
             expenseTitle: doc.data().expenseTitle,
-            expenseAmount: doc.data().expenseAmount,
+            expenseAmount: Number(doc.data().expenseAmount),
             time: doc.data().time,
             id: doc.id
         });
@@ -69,6 +70,7 @@ getData();
     // rendering data on the screen 
 function renderExpense() {
     listWrapper.innerHTML = '';
+    totalAmountCalc()
     for (let i = 0; i < expenseArr.length; i++) {
         listWrapper.innerHTML += `
         <div class="d-flex justify-content-center list-wrapper-in w-100">
@@ -130,3 +132,39 @@ function totalAmountCalc() {
     }, 0);
     totalAmountWrapper.innerHTML = `$${totalAmount}`
 }
+
+
+
+    // sort by time
+    sort.addEventListener('click', async ()=>{
+        const q = query(collection(db, "expenses"), orderBy("time", "desc"));
+        const querySnapshot = await getDocs(q);
+        expenseArr = [];
+        querySnapshot.forEach((doc) => {
+        expenseArr.push({
+            expenseTitle: doc.data().expenseTitle,
+            expenseAmount: Number(doc.data().expenseAmount),
+            time: doc.data().time,
+            id: doc.id
+        });
+    });
+    renderExpense();
+    })
+
+
+
+    // sort by Amount
+    sortAmount.addEventListener('click', async ()=>{
+        const q = query(collection(db, "expenses"), orderBy("expenseAmount", "desc"));
+        const querySnapshot = await getDocs(q);
+        expenseArr = [];
+        querySnapshot.forEach((doc) => {
+        expenseArr.push({
+            expenseTitle: doc.data().expenseTitle,
+            expenseAmount: Number(doc.data().expenseAmount),
+            time: doc.data().time,
+            id: doc.id
+        });
+    });
+    renderExpense();
+    })
