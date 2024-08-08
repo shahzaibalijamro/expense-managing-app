@@ -1,6 +1,6 @@
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"; 
-
-import { db } from "./config.js";
+import { signOut  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { db, auth } from "./config.js";
 
 const form = document.querySelector('#form');
 const inputTitle = document.querySelector('.input-title');
@@ -9,10 +9,27 @@ const totalAmountWrapper = document.querySelector('.total-amount-2');
 const listWrapper = document.querySelector('.list-wrapper-out');
 const sort = document.querySelector('#sort');
 const sortAmount = document.querySelector('#sortAmount');
+const logoImg = document.querySelector('#logo-img');
+const navButtonWrapper = document.querySelector('#nav-button-wrapper');
+const signOutBtn = document.querySelector('#sign-out');
 let expenseArr = [];
 let totalAmount;
 
-
+function getUser() {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            const uid = user.uid;
+            console.log("User UID: ", user.photoURL);
+            logoImg.src = user.photoURL;
+            navButtonWrapper.innerHTML = `
+            <button id="sign-out" type="button" class="btn btn-danger">Sign out</button>
+            `
+        } else {
+            console.log("No user signed in");
+        }
+    });
+}
+getUser();
 
     // value sumbition
 form.addEventListener('submit', event => {
@@ -137,6 +154,7 @@ function totalAmountCalc() {
 
     // sort by time
     sort.addEventListener('click', async ()=>{
+        console.log(213);
         const q = query(collection(db, "expenses"), orderBy("time", "desc"));
         const querySnapshot = await getDocs(q);
         expenseArr = [];
@@ -155,6 +173,8 @@ function totalAmountCalc() {
 
     // sort by Amount
     sortAmount.addEventListener('click', async ()=>{
+        console.log(213);
+        
         const q = query(collection(db, "expenses"), orderBy("expenseAmount", "desc"));
         const querySnapshot = await getDocs(q);
         expenseArr = [];
@@ -167,4 +187,14 @@ function totalAmountCalc() {
         });
     });
     renderExpense();
+    })
+
+
+    // signout functionality
+    signOutBtn.addEventListener('click', ()=>{
+        signOut(auth).then(() => {
+            window.location = 'login.html'
+        }).catch((error) => {
+            alert(error)
+        });
     })
