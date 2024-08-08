@@ -71,12 +71,15 @@ githubBtn.addEventListener('click', (event)=>{
     signInWithPopup(auth, githubProvider)
     .then(async (result) => {
         const user = result.user;
+        console.log(user.photoURL);
+        
         console.log(user.email);
         console.log(user.displayName);
         console.log(user.uid);
         await setDoc(doc(db, "users", user.email), {
             name: user.displayName,
-            uid: user.uid
+            uid: user.uid,
+            dp: user.photoURL
         });
         window.location = 'index.html';
     }).catch((error) => {

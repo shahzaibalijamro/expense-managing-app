@@ -1,5 +1,5 @@
-import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, Timestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js"; 
-import { signOut  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc, Timestamp, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { db, auth } from "./config.js";
 
 const form = document.querySelector('#form');
@@ -12,18 +12,39 @@ const sortAmount = document.querySelector('#sortAmount');
 const logoImg = document.querySelector('#logo-img');
 const navButtonWrapper = document.querySelector('#nav-button-wrapper');
 const signOutBtn = document.querySelector('#sign-out');
+const userNameNav = document.querySelector('#userNameNav');
+const loginAndRegister = document.querySelector('#login-and-register');
 let expenseArr = [];
 let totalAmount;
+let currentUser = [];
+signOutBtn.style.display = 'none';
 
-function getUser() {
-    auth.onAuthStateChanged(user => {
+
+// checking user status
+async function getUser() {
+    auth.onAuthStateChanged(async user => {
         if (user) {
             const uid = user.uid;
-            console.log("User UID: ", user.photoURL);
-            logoImg.src = user.photoURL;
-            navButtonWrapper.innerHTML = `
-            <button id="sign-out" type="button" class="btn btn-danger">Sign out</button>
-            `
+            // console.log("User UID: ", uid);
+            const userRef = collection(db, "users");
+            const q = query(userRef, where("uid", "==", uid));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                currentUser.push({
+                    name: doc.data().name,
+                    dp: doc.data().dp,
+                    uid: uid
+                })
+            });
+            console.log(currentUser);
+            if (currentUser[0].dp) {
+                logoImg.src = currentUser[0].dp;
+            } else {
+                logoImg.src = "https://i.pinimg.com/originals/c0/27/be/c027bec07c2dc08b9df60921dfd539bd.webp";
+            }
+            userNameNav.innerHTML = currentUser[0].name;
+            loginAndRegister.style.display = 'none';
+            signOutBtn.style.display = 'block';
         } else {
             console.log("No user signed in");
         }
@@ -31,7 +52,9 @@ function getUser() {
 }
 getUser();
 
-    // value sumbition
+
+
+// value sumbition
 form.addEventListener('submit', event => {
     event.preventDefault();
     addExpense();
@@ -39,52 +62,69 @@ form.addEventListener('submit', event => {
 
 
 
-    // pushing data to firestore and array
+// pushing data to firestore and array
 async function addExpense() {
-    let toNumber = Number(inputAmount.value);
-    try {
-        const docRef = await addDoc(collection(db, "expenses"), {
-            expenseTitle: inputTitle.value,
-            expenseAmount: toNumber,
-            time: Timestamp.fromDate(new Date())
-        });
-        expenseArr.push({
-            expenseTitle: inputTitle.value,
-            expenseAmount: toNumber,
-            id : docRef.id
-        })
-        console.log("Document written with ID: ", docRef.id);
-        inputTitle.value= '';
-        inputAmount.value= '';
-        console.log(expenseArr);
-        renderExpense();
-    } catch (e) {
-        console.error("Error adding document: ", e);
-    }
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const uid = user.uid;
+            let toNumber = Number(inputAmount.value);
+            try {
+                const docRef = await addDoc(collection(db, "expenses"), {
+                    expenseTitle: inputTitle.value,
+                    expenseAmount: toNumber,
+                    time: Timestamp.fromDate(new Date()),
+                    uid: uid
+                });
+                expenseArr.push({
+                    expenseTitle: inputTitle.value,
+                    expenseAmount: toNumber,
+                    id: docRef.id,
+                    uid: uid
+                })
+                console.log("Document written with ID: ", docRef.id);
+                inputTitle.value = '';
+                inputAmount.value = '';
+                console.log(expenseArr);
+                renderExpense();
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        } else {
+            alert('Please sign in to add an expense!')
+        }
+    });
 }
 
 
 
-    // get data from firestore
+// get data from firestore
 async function getData() {
-    const querySnapshot = await getDocs(collection(db, "expenses"));
-    querySnapshot.forEach((doc) => {
-        expenseArr.push({
-            expenseTitle: doc.data().expenseTitle,
-            expenseAmount: Number(doc.data().expenseAmount),
-            time: doc.data().time,
-            id: doc.id
-        });
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const uid = user.uid;
+            const singleUserRef = collection(db, "expenses");
+            const q = query(singleUserRef, where("uid", "==", uid));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                expenseArr.push({
+                    expenseTitle: doc.data().expenseTitle,
+                    expenseAmount: Number(doc.data().expenseAmount),
+                    time: doc.data().time,
+                    id: doc.id
+                });
+            });
+            renderExpense();
+        } else {
+            console.log("No user signed in");
+        }
     });
-    console.log(expenseArr);
-    renderExpense();
 }
 getData();
 
 
 
 
-    // rendering data on the screen 
+// rendering data on the screen 
 function renderExpense() {
     listWrapper.innerHTML = '';
     totalAmountCalc()
@@ -114,8 +154,8 @@ function renderExpense() {
 
     // edit function
     const editBtn = document.querySelectorAll('.fa-pen-to-square');
-    editBtn.forEach((item,index)=>{
-        item.addEventListener('click', async ()=>{
+    editBtn.forEach((item, index) => {
+        item.addEventListener('click', async () => {
             const edited = prompt('Edit Amount!', expenseArr[index].expenseAmount);
             const updateRef = doc(db, "expenses", expenseArr[index].id);
             await updateDoc(updateRef, {
@@ -131,18 +171,18 @@ function renderExpense() {
 
     // delete function
     const dltBtn = document.querySelectorAll('.fa-trash-can');
-    dltBtn.forEach((item,index)=>{
-        item.addEventListener('click',async()=>{
+    dltBtn.forEach((item, index) => {
+        item.addEventListener('click', async () => {
             await deleteDoc(doc(db, "expenses", expenseArr[index].id));
             console.log('document dlt with id ==>', expenseArr[index].id);
-            expenseArr.splice(index,1)
+            expenseArr.splice(index, 1)
             renderExpense();
         })
     })
 }
 
 
-    // calculates Total Amount
+// calculates Total Amount
 function totalAmountCalc() {
     totalAmount = expenseArr.reduce((accumulator, currentExpense) => {
         return accumulator + currentExpense.expenseAmount;
@@ -152,49 +192,60 @@ function totalAmountCalc() {
 
 
 
-    // sort by time
-    sort.addEventListener('click', async ()=>{
-        console.log(213);
-        const q = query(collection(db, "expenses"), orderBy("time", "desc"));
-        const querySnapshot = await getDocs(q);
-        expenseArr = [];
-        querySnapshot.forEach((doc) => {
-        expenseArr.push({
-            expenseTitle: doc.data().expenseTitle,
-            expenseAmount: Number(doc.data().expenseAmount),
-            time: doc.data().time,
-            id: doc.id
-        });
+// sort by time
+sort.addEventListener('click', async () => {
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const uid = user.uid;
+            const q = query(collection(db, "expenses"), where("uid", "==", uid), orderBy("time", "desc"));
+            const querySnapshot = await getDocs(q);
+            expenseArr = [];
+            querySnapshot.forEach((doc) => {
+                expenseArr.push({
+                    expenseTitle: doc.data().expenseTitle,
+                    expenseAmount: Number(doc.data().expenseAmount),
+                    time: doc.data().time,
+                    id: doc.id
+                });
+            });
+            renderExpense();
+        } else {
+            console.log("No user signed in");
+        }
     });
-    renderExpense();
-    })
+})
 
 
 
-    // sort by Amount
-    sortAmount.addEventListener('click', async ()=>{
-        console.log(213);
-        
-        const q = query(collection(db, "expenses"), orderBy("expenseAmount", "desc"));
-        const querySnapshot = await getDocs(q);
-        expenseArr = [];
-        querySnapshot.forEach((doc) => {
-        expenseArr.push({
-            expenseTitle: doc.data().expenseTitle,
-            expenseAmount: Number(doc.data().expenseAmount),
-            time: doc.data().time,
-            id: doc.id
-        });
+// sort by Amount
+sortAmount.addEventListener('click', async () => {
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const uid = user.uid;
+            const q = query(collection(db, "expenses"), where("uid", "==", uid), orderBy("expenseAmount", "desc"));
+            const querySnapshot = await getDocs(q);
+            expenseArr = [];
+            querySnapshot.forEach((doc) => {
+                expenseArr.push({
+                    expenseTitle: doc.data().expenseTitle,
+                    expenseAmount: Number(doc.data().expenseAmount),
+                    time: doc.data().time,
+                    id: doc.id
+                });
+            });
+            renderExpense();
+        } else {
+            console.log("No user signed in");
+        }
     });
-    renderExpense();
-    })
+})
 
 
-    // signout functionality
-    signOutBtn.addEventListener('click', ()=>{
-        signOut(auth).then(() => {
-            window.location = 'login.html'
-        }).catch((error) => {
-            alert(error)
-        });
-    })
+// signout functionality
+signOutBtn.addEventListener('click', () => {
+    signOut(auth).then(() => {
+        window.location = 'login.html'
+    }).catch((error) => {
+        alert(error)
+    });
+})
