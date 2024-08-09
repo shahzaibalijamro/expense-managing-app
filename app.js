@@ -18,12 +18,14 @@ let expenseArr = [];
 let totalAmount;
 let currentUser = [];
 signOutBtn.style.display = 'none';
-
+loginAndRegister.style.display = 'block';
 
 // checking user status
 async function getUser() {
     auth.onAuthStateChanged(async user => {
         if (user) {
+            loginAndRegister.style.display = 'none';
+            signOutBtn.style.display = 'block';
             const uid = user.uid;
             // console.log("User UID: ", uid);
             const userRef = collection(db, "users");
@@ -36,17 +38,18 @@ async function getUser() {
                     uid: uid
                 })
             });
-            console.log(currentUser);
+            userNameNav.innerHTML = currentUser[0].name;
             if (currentUser[0].dp) {
                 logoImg.src = currentUser[0].dp;
             } else {
                 logoImg.src = "https://i.pinimg.com/originals/c0/27/be/c027bec07c2dc08b9df60921dfd539bd.webp";
             }
-            userNameNav.innerHTML = currentUser[0].name;
-            loginAndRegister.style.display = 'none';
-            signOutBtn.style.display = 'block';
         } else {
-            console.log("No user signed in");
+            listWrapper.innerHTML += `
+            <div class="d-flex justify-content-center list-wrapper-in w-100">
+                    <h1 style="font-size: 18px;margin: 0px;text-align:center;padding-bottom:20px">Please sign in to view your expenses</h1>
+            </div>
+        `
         }
     });
 }
@@ -128,6 +131,13 @@ getData();
 function renderExpense() {
     listWrapper.innerHTML = '';
     totalAmountCalc()
+    if (expenseArr.length < 1) {
+        listWrapper.innerHTML += `
+        <div class="d-flex justify-content-center list-wrapper-in w-100">
+            <h1 style="font-size: 18px;margin: 0px;text-align:center;padding-bottom:15px">No expenses found.</h1>
+        </div>
+`
+    }
     for (let i = 0; i < expenseArr.length; i++) {
         listWrapper.innerHTML += `
         <div class="d-flex justify-content-center list-wrapper-in w-100">
