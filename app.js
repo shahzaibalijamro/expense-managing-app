@@ -167,13 +167,15 @@ function renderExpense() {
     editBtn.forEach((item, index) => {
         item.addEventListener('click', async () => {
             const edited = (Number(prompt('Edit Amount!', expenseArr[index].expenseAmount)));
+            console.log(typeof(edited));
+            
             if (isNaN(edited) || edited <= 0) {
                 alert("Please enter a valid amount.");
                 return;
             }
             const updateRef = doc(db, "expenses", expenseArr[index].id);
             await updateDoc(updateRef, {
-                expenseAmount: edited
+                expenseAmount: Number(edited)
             });
             expenseArr[index].expenseAmount = edited;
             renderExpense();
