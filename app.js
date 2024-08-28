@@ -180,6 +180,7 @@ function renderExpense() {
             expenseArr[index].expenseAmount = Number(edited);
             renderExpense();
             totalAmountCalc();
+            console.log(totalAmount);
         })
     })
 
@@ -201,6 +202,7 @@ function renderExpense() {
 
 // calculates Total Amount
 function totalAmountCalc() {
+    console.log(expenseArr);
     totalAmount = expenseArr.reduce((accumulator, currentExpense) => {
         console.log(typeof(accumulator));
         console.log(typeof(currentExpense.expenseAmount));
