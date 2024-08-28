@@ -93,7 +93,7 @@ async function addExpense() {
                 console.error("Error adding document: ", e);
             }
         } else {
-            alert('Please sign in to add an expense!')
+            window.location = "login.html"
         }
     });
 }
