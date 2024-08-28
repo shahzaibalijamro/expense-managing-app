@@ -177,7 +177,7 @@ function renderExpense() {
             await updateDoc(updateRef, {
                 expenseAmount: Number(edited)
             });
-            expenseArr[index].expenseAmount = edited;
+            expenseArr[index].expenseAmount = Number(edited);
             renderExpense();
             totalAmountCalc();
         })
@@ -204,7 +204,7 @@ function totalAmountCalc() {
     totalAmount = expenseArr.reduce((accumulator, currentExpense) => {
         console.log(typeof(accumulator));
         console.log(typeof(currentExpense.expenseAmount));
-        return accumulator + currentExpense.expenseAmount;
+        return (Number(accumulator)) + (Number(currentExpense.expenseAmount));
     }, 0);
     totalAmountWrapper.innerHTML = `$${totalAmount}`
 }
