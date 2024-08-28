@@ -166,7 +166,7 @@ function renderExpense() {
     const editBtn = document.querySelectorAll('.fa-pen-to-square');
     editBtn.forEach((item, index) => {
         item.addEventListener('click', async () => {
-            const edited = +prompt('Edit Amount!', expenseArr[index].expenseAmount);
+            const edited = (Number(prompt('Edit Amount!', expenseArr[index].expenseAmount)));
             if (isNaN(edited) || edited <= 0) {
                 alert("Please enter a valid amount.");
                 return;
@@ -200,6 +200,8 @@ function renderExpense() {
 // calculates Total Amount
 function totalAmountCalc() {
     totalAmount = expenseArr.reduce((accumulator, currentExpense) => {
+        console.log(typeof(accumulator));
+        console.log(typeof(currentExpense.expenseAmount));
         return accumulator + currentExpense.expenseAmount;
     }, 0);
     totalAmountWrapper.innerHTML = `$${totalAmount}`
