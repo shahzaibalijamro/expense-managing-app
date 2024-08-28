@@ -166,7 +166,7 @@ function renderExpense() {
     const editBtn = document.querySelectorAll('.fa-pen-to-square');
     editBtn.forEach((item, index) => {
         item.addEventListener('click', async () => {
-            const edited = prompt('Edit Amount!', expenseArr[index].expenseAmount);
+            const edited = +prompt('Edit Amount!', expenseArr[index].expenseAmount);
             const updateRef = doc(db, "expenses", expenseArr[index].id);
             await updateDoc(updateRef, {
                 expenseAmount: edited
